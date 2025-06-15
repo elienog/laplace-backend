@@ -1,22 +1,27 @@
 from flask import Flask, request, jsonify
-from sympy import symbols, laplace_transform, sympify, simplify
+from sympy import symbols, laplace_transform, simplify
 from sympy.abc import t, s
 
 app = Flask(__name__)
 
-@app.route('/laplace', methods=['POST'])
-def laplace_api():
-    data = request.get_json()
+@app.route("/laplace", methods=["POST"])
+def laplace():
     try:
-        expr = sympify(data['function'])
-        L, _, _ = laplace_transform(expr, t, s)
-        return jsonify({
-            "original": str(expr),
-            "laplace": str(simplify(L))
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        data = request.get_json()
+        expr_str = data.get("expression")
 
-@app.route('/', methods=['GET'])
+        if not expr_str:
+            return jsonify({"error": "No se proporcionó una función."}), 400
+
+        expr = simplify(expr_str)
+        F = laplace_transform(expr, t, s, noconds=True)
+
+        return jsonify({"result": str(F)})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route("/", methods=["GET"])
 def home():
-    return 'API de Transformada de Laplace funcionando.'
+    return "API de Transformada de Laplace activa."
