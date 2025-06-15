@@ -5,7 +5,7 @@ from sympy.abc import t, s
 app = Flask(__name__)
 
 @app.route("/laplace", methods=["POST"])
-def laplace():
+def calcular_laplace():
     try:
         data = request.get_json()
         expr_str = data.get("expression")
@@ -20,7 +20,6 @@ def laplace():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route("/", methods=["GET"])
 def home():
